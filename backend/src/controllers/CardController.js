@@ -4,7 +4,7 @@ export const getAllCards = async (req, res) => {
 
     try {
         const cards = await Card.find().sort({ createdAt: -1 });
-        res.status(200).json({ message: "getAllCards", cards })
+        res.status(200).json(cards)
     } catch (error) {
         res.status(500).json({ message: "Error getting all cards" })
     }
@@ -16,7 +16,7 @@ export const getCardById = async (req, res) => {
         if (!card) {
             return res.status(404).json({ message: "Card not found" });
         }
-        res.status(200).json({ card })
+        res.status(200).json(card)
 
     } catch (error) {
         res.status(500).json({ message: "Error getting card by id" })
