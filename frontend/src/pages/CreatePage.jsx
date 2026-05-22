@@ -13,14 +13,17 @@ const CreatePage = () => {
     const [company, setCompany] = useState("")
     const [location, setLocation] = useState("")
     const [salary, setSalary] = useState("")
-    const [status, setStatus] = useState("")
+    const [status, setStatus] = useState("Applied")
+    const [loading, setLoading] = useState(false)
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!title || !company || !location || !salary) {
             return toast.error("Please fill all the fields")
         }
+        setLoading(true)
         try {
+
             const response = await api.post("/cards", {
                 title, company, location, salary, status
             })
@@ -32,10 +35,18 @@ const CreatePage = () => {
         } catch (error) {
             console.log(error)
             toast.error("Something went wrong");
+            if (error.response.status === 429) {
+                toast.error("Slow down! You're creating notes too fast", {
+                    duration: 4000,
+                    icon: "💀",
+                });
+            }
+        } finally {
+            setLoading(false)
         }
     }
     return (
-        <div>
+        <div className="min-h-screen bg-base-200">
             <div className="container mx-auto px-4 py-8">
                 <div className="max-w-2xl mx-auto">
                     <Link to={"/"} className="btn btn-ghost mb-6">
@@ -47,7 +58,7 @@ const CreatePage = () => {
                         <div className="card-body">
                             <h2 className="card-title text-3xl font-semi-bold text-[#2f1f46] mb-4" >Create a New Job Application</h2>
                             <div className="">
-                                <form onSubmit={handleSubmit()}>
+                                <form onSubmit={handleSubmit}>
                                     <div className="form-control mb-4">
                                         <label className="label mr-4 mb-2">
                                             <span className="label-text font-medium">Role</span>
@@ -85,7 +96,7 @@ const CreatePage = () => {
                                         </select>
                                     </div>
                                     <div className="card-actions justify-end" >
-                                        <button className="btn btn-primary px-8" type="submit" > Submit </button>
+                                        <button className="btn btn-primary px-8" type="submit" disabled={loading}> {loading ? "Loading... " : "Submit"} </button>
                                     </div>
 
                                 </form>

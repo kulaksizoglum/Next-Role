@@ -1,8 +1,23 @@
 
 import { PenSquareIcon, Trash2Icon } from "lucide-react";
 import { Link } from "react-router"
-const Card = ({ card }) => {
-    console.log(card)
+import api from "../lib/axios";
+import toast from "react-hot-toast";
+
+const Card = ({ card, setJobs }) => {
+    const handleDelete = async (e, id) => {
+        e.preventDefault()
+        if (!window.confirm("Are you sure you want to delete this note?")) return;
+        try {
+            await api.delete(`/cards/${id}`)
+            toast.success("Application deleted successfully")
+            setJobs((jobs) => jobs.filter(job => job._id !== id))
+        } catch (error) {
+            toast.error("Error deleting application")
+            console.log("ERRORR IS ", error)
+        }
+    }
+
     return (
         <Link
             to={`/cards/${card._id}`}
@@ -24,9 +39,8 @@ const Card = ({ card }) => {
                     </span>
                     <div className="flex items-center gap-1">
                         <PenSquareIcon className="size-4" />
-                        <button
-                            className="btn btn-ghost btn-xs text-error"
-
+                        <button className="btn btn-ghost btn-xs text-error"
+                            onClick={(e) => handleDelete(e, card._id)}
                         >
                             <Trash2Icon className="size-4" />
                         </button>
