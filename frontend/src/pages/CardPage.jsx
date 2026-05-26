@@ -3,18 +3,28 @@ import { ArrowLeftIcon, Trash2Icon, LoaderIcon } from "lucide-react"
 import { useEffect, useState } from "react"
 import api from "../lib/axios"
 import toast from "react-hot-toast"
+import { useAuthContext } from "../hooks/useAuthContext"
+
 
 const CardDetailPage = () => {
     const [saving, setSaving] = useState(false)
     const [loading, setLoading] = useState(true);
     const [card, setCard] = useState("")
     const { id } = useParams()
+    const { user } = useAuthContext()
+
     const navigate = useNavigate()
 
     useEffect(() => {
         const fetchNote = async () => {
             try {
-                const response = await api.get(`/cards/${id}`)
+                const response = await api.get(`/cards/${id}`,
+                    {
+                        headers: {
+                            "Authorization": `Bearer ${user.token}`
+                        }
+                    }
+                )
                 setCard(response.data)
             } catch (error) {
                 console.log(error)
@@ -27,10 +37,18 @@ const CardDetailPage = () => {
     }, [id])
 
     const handleDelete = async (e) => {
+        if (!user) {
+            return
+        }
         e.preventDefault()
         if (!window.confirm("Are you sure you want to delete this note?")) return;
         try {
-            await api.delete(`/cards/${id}`)
+            await api.delete(`/cards/${id}`,
+                {
+                    headers: {
+                        "Authorization": `Bearer ${user.token}`
+                    }
+                })
             toast.success("Application deleted successfully")
             navigate("/")
         } catch (error) {
@@ -46,7 +64,13 @@ const CardDetailPage = () => {
         }
         setSaving(true)
         try {
-            const response = await api.put(`/cards/${id}`, card)
+            const response = await api.put(`/cards/${id}`, card,
+                {
+                    headers: {
+                        "Authorization": `Bearer ${user.token}`
+                    }
+                }
+            )
             if (response.status === 200) {
                 toast.success("Card updated successfully")
                 navigate("/")

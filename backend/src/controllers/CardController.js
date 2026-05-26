@@ -3,7 +3,8 @@ import Card from "../models/CardModel.js"
 export const getAllCards = async (req, res) => {
 
     try {
-        const cards = await Card.find().sort({ createdAt: -1 });
+        const user_id = req.user._id
+        const cards = await Card.find({ user_id }).sort({ createdAt: -1 });
         res.status(200).json(cards)
     } catch (error) {
         res.status(500).json({ message: "Error getting all cards" })
@@ -33,7 +34,10 @@ export const createCard = async (req, res) => {
     }
 
     try {
-        const card = new Card({ title, company, location, salary })
+        console.log(req.user._id)
+        const user_id = req.user._id
+
+        const card = new Card({ title, company, location, salary, user_id })
         await card.save()
         res.status(201).json({ message: "createCard", card })
     } catch (error) {

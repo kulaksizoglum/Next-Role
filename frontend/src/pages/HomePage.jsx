@@ -1,20 +1,29 @@
 import Navbar from "../components/Navbar"
-import { useEffect, useState } from "react"
+import { useEffect, useState, } from "react"
+import { useAuthContext } from "../hooks/useAuthContext"
 import api from "../lib/axios"
 import Card from "../components/Card"
 import CardsNotFound from "../components/CardNotFound"
-import toast from "react-hot-toast"
 import RateLimitedUI from "../components/RateLimitedUI"
+import AuthRequiredUI from "../components/AuthRequiredUI"
+
 const HomePage = () => {
     const [jobs, setJobs] = useState([]);
-    const [loading, setLoading] = useState(true);
-    const [isRateLimited, setIsRateLimited] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [isRateLimited, setIsRateLimited] = useState(false)
+    const { user } = useAuthContext()
 
 
     useEffect(() => {
         const fetchJobs = async () => {
             try {
-                const response = await api.get("/cards")
+                console.log("FETCH JOBS EFFECT WORKED")
+                setLoading(true)
+                const response = await api.get("/cards", {
+                    headers: {
+                        "Authorization": `Bearer ${user.token}`
+                    }
+                })
                 setJobs(response.data)
                 console.log(response.data)
                 setIsRateLimited(false);
@@ -22,22 +31,24 @@ const HomePage = () => {
                 console.log(error)
                 if (error.response?.status === 429) {
                     setIsRateLimited(true);
-                } else {
-                    toast.error("Failed to load notes");
                 }
             } finally {
                 setLoading(false)
             }
         }
-        fetchJobs()
-    }, [])
+
+        if (user) {
+            fetchJobs()
+        }
+
+    }, [user])
 
     return (
         <div className="min-h-screen">
             <Navbar />
             {isRateLimited && <RateLimitedUI />}
-
-            <div className="max-w-7xl mx-auto p-4 mt-6">
+            {!user && <AuthRequiredUI />}
+            {user && <div className="max-w-7xl mx-auto p-4 mt-6">
                 {loading && <div className="text-center text-primary py-10">Loading notes...</div>}
                 {jobs.length === 0 && <CardsNotFound />}
                 {jobs.length > 0 &&
@@ -46,6 +57,8 @@ const HomePage = () => {
                     </div>
                 }
             </div>
+            }
+
         </div>
     )
 }

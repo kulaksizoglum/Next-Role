@@ -29,10 +29,11 @@ const cardSchema = new mongoose.Schema({
         type: String,
     },
 
-    appliedDate: {
-        type: Date,
-        default: Date.now,
-    },
+
+    user_id: {
+        type: String,
+        required: true,
+    }
 
 }, { timestamps: true })
 

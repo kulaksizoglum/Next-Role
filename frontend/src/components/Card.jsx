@@ -3,13 +3,18 @@ import { PenSquareIcon, Trash2Icon } from "lucide-react";
 import { Link } from "react-router"
 import api from "../lib/axios";
 import toast from "react-hot-toast";
-
+import { useAuthContext } from "../hooks/useAuthContext";
 const Card = ({ card, setJobs }) => {
+    const { user } = useAuthContext()
     const handleDelete = async (e, id) => {
         e.preventDefault()
         if (!window.confirm("Are you sure you want to delete this note?")) return;
         try {
-            await api.delete(`/cards/${id}`)
+            await api.delete(`/cards/${id}`, {
+                headers: {
+                    "Authorization": `Bearer ${user.token}`
+                }
+            })
             toast.success("Application deleted successfully")
             setJobs((jobs) => jobs.filter(job => job._id !== id))
         } catch (error) {

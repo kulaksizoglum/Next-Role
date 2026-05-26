@@ -4,6 +4,7 @@ import { useNavigate } from "react-router"
 import toast from "react-hot-toast"
 import { ArrowLeftIcon } from "lucide-react"
 import { Link } from "react-router"
+import { useAuthContext } from "../hooks/useAuthContext"
 
 
 const CreatePage = () => {
@@ -15,8 +16,13 @@ const CreatePage = () => {
     const [salary, setSalary] = useState("")
     const [status, setStatus] = useState("Applied")
     const [loading, setLoading] = useState(false)
+    const { user } = useAuthContext()
 
     const handleSubmit = async (e) => {
+        if (!user) {
+            toast.error("You must be logged in")
+            return
+        }
         e.preventDefault();
         if (!title || !company || !location || !salary) {
             return toast.error("Please fill all the fields")
@@ -25,8 +31,8 @@ const CreatePage = () => {
         try {
 
             const response = await api.post("/cards", {
-                title, company, location, salary, status
-            })
+                title, company, location, salary, status,
+            }, { headers: { "Authorization": `Bearer ${user.token}` } })
             if (response.status === 201) {
                 toast.success("Job created successfully");
                 navigate("/")
@@ -46,7 +52,7 @@ const CreatePage = () => {
         }
     }
     return (
-        <div className="min-h-screen bg-base-200">
+        <div className="min-h-screen">
             <div className="container mx-auto px-4 py-8">
                 <div className="max-w-2xl mx-auto">
                     <Link to={"/"} className="btn btn-ghost mb-6">
