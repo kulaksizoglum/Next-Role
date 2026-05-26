@@ -24,6 +24,7 @@ const Navbar = () => {
                             <div className="flex items-center">
                                 <div className="flex items-center gap-4">
                                     <span className="text-xl font-bold text-primary font-mono tracking-tight">Welcome</span>
+
                                     <span className="text-xl font-bold text-primary font-mono tracking-tight mr-35"> {user.email}</span>
 
                                     <Link to={"/create"} className="btn btn-ghost ml-8">

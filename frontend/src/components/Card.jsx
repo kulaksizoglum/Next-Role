@@ -4,6 +4,7 @@ import { Link } from "react-router"
 import api from "../lib/axios";
 import toast from "react-hot-toast";
 import { useAuthContext } from "../hooks/useAuthContext";
+import { formatDate } from "../lib/utils.js"
 const Card = ({ card, setJobs }) => {
     const { user } = useAuthContext()
     const handleDelete = async (e, id) => {
@@ -40,7 +41,7 @@ const Card = ({ card, setJobs }) => {
                 </div>
                 <div className="card-actions justify-between items-center mt-4">
                     <span className="text-sm text-base-content/60">
-                        {(card.createdAt)}
+                        {(formatDate(new Date(card.createdAt)))}
                     </span>
                     <div className="flex items-center gap-1">
                         <PenSquareIcon className="size-4" />
